@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'i^6hfjy&+s%ixa2^ea_vqi7**-mdv2@_f@4wwzl3z0cm8hl20%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+#DEBUG = True
 
 ALLOWED_HOSTS = ['81.196.127.11', 'weatherapi.netshare.ro', 'www.weatherapi.netshare.ro']
 

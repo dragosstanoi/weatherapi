@@ -148,8 +148,6 @@ def api_location_detail(request, *args, **kwargs):
         serializer = DetailLocationSerializer(location, data = request.data, partial=True)
         if serializer.is_valid(raise_exception=True):
 
-            logger=logging.getLogger('django')
-            logger.info('Validated data :' + pformat(dir(serializer)))
             #
             # Just user information
             if(request.data.get('location_name') or request.data.get('location_lat') or request.data.get('location_lon') or request.data.get('user')):
