@@ -99,7 +99,7 @@ def api_locations(request, *args, **kwargs):
                 'location_country' : response['sys']['country'],
                 'location_timezone' : response['timezone'],
                 'location_id' : response['id'],
-                'location_avail_params' : str(hyst_data['params'])        
+                'location_avail_params' : json.dumps({ 'parameters' : hyst_data['params']})        
             }
             location = Location(user=request.user)
             serializer = LocationAddSerializer(location, data = build_data, partial=True)
@@ -192,13 +192,12 @@ def api_location_parameters(request, *args, **kwargs):
         
         status_data={}
 
-        #logger=logging.getLogger('django')
-        #logger.info('Args :' +pformat(location.location_avail_params))
-        #logger.info('Args :' +pformat(type(list(location.location_avail_params))))
-        location_para = list(location.location_avail_params)
-        if request.data['parameter_key_name'] not in location_para:
+        location_para = json.loads(location.location_avail_params)
+        
+        if request.data['parameter_key_name'] not in location_para['parameters']:
             status_data['error'] = 'We have an error : parameter not in list !'
             status_data['data'] = request.data
+            status_data['available_parameters'] = location_para['parameters']
             return Response(status_data, status=status.HTTP_400_BAD_REQUEST)
 
         
