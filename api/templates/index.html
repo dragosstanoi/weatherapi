@@ -1,4 +1,5 @@
 {% load static %}
+{% load location_tag %}
 <html>
 
     <head>
@@ -11,7 +12,11 @@
         {% load bootstrap5 %}
         {% bootstrap_css %}
         {% bootstrap_javascript %}
-
+        <!-- other css&js -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+        <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.0/css/jquery.dataTables.css">
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.12.0/js/jquery.dataTables.js"></script>
         <link rel="stylesheet" type="text/css" href="{% static '/css/homecss.css' %}">
         
     
@@ -47,14 +52,6 @@
                         </nav>
                 </div>
         </div>
-
-        <!--
-        <div class="row p-4">
-                <div class="col-xs-12">
-                        <h4> We can do :</h4>
-                </div>
-        </div>
-        -->
 
         <div class="row mt-5">
                 <div class="col-xs-12">
@@ -141,6 +138,64 @@
 
                 </div>
         </div>
+
+        <!-- List my locations -->
+
+        <div class="row">
+                <div class="col-12">
+                        <div class="card mb-4 mt-4">
+                                <div class="card-header">
+                                <i class="fas fa-table me-1"></i>
+                                My Locations 
+                                </div>
+                                <div class="card-body">
+                                <table id="Locationdatatable">
+                                        <thead>
+                                        </tr>
+                                                <th> id </th>
+                                                <th> Name </th>
+                                                <th> Description </th>
+                                                <th> Latest update</th>
+                                                <th> Latest Data </th>
+                                                <th> Aggregation </th>
+                                        
+                                        </tr>
+                                        </thead>
+                                        <tfoot>
+                                                </tr>
+                                                        <th> id </th>
+                                                        <th> Name </th>
+                                                        <th> Description </th>
+                                                        <th> Latest update</th>
+                                                        <th> Latest Data </th>
+                                                        <th> Aggregation </th>
+                                                
+                                                </tr>
+                                        </tfoot>
+                                        <tbody>
+                                        {% for key in my_locations %}
+                                        <tr>                        
+                                                <td>{{ key.id }}</td>
+                                                <td>{{ key.location_name }}</td>
+                                                <td>{{ key.description }}</td>
+                                                <td>{{ key.lastupdate_at }}</td>
+                                                <td>{{ key.location_latest_data }}</td>
+                                                <td>{{ key.aggregation }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                        
+                                        </tbody>
+                                </table>
+                                </div>
+                        </div>
+                </div>
+        </div>
+
+        <!-- more js -->
+        
+        <script src="{% static '/js/homejs.js' %}"></script>
+
+
 </div>
 
 </body>

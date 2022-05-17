@@ -54,7 +54,12 @@ def api_home(request):
     #for user in Account.objects.all():
     #    Token.objects.get_or_create(user=user)
 
-    context = {}
+    my_locations = Location.objects.filter(user=request.user).values()
+    
+    context = {
+        'my_locations' : my_locations
+    }
+
     return render(request, "index.html", context)
     
 
@@ -99,7 +104,8 @@ def api_locations(request, *args, **kwargs):
                 'location_country' : response['sys']['country'],
                 'location_timezone' : response['timezone'],
                 'location_id' : response['id'],
-                'location_avail_params' : json.dumps({ 'parameters' : hyst_data['params']})        
+                'location_avail_params' : json.dumps({ 'parameters' : hyst_data['params']}),
+                'location_latest_data' : json.dumps({ 'latest_data' : hyst_data['current']})        
             }
             location = Location(user=request.user)
             serializer = LocationAddSerializer(location, data = build_data, partial=True)

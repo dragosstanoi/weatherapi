@@ -21,10 +21,11 @@ def getUpdateLocData():
         params=i.parameter_set.all()
         
         #logger.info("Location :" + i.location_name )
+        returnData = apiCallHistory(i.location_lat, i.location_lon)
 
         if params:
-            for y in params:       
-                returnData = apiCallHistory(i.location_lat, i.location_lon)
+
+            for y in params:               
                 #logger.info(pformat(returnData))
                 y.latest_value=json.dumps({returnData['current']['dt'] : returnData['current'][y.parameter_key_name]})
 
@@ -52,7 +53,9 @@ def getUpdateLocData():
                     "units" : y.unitsofmeasurment
                     })
         
-        i.aggregation=json.dumps(locAgg)
+            i.aggregation=json.dumps(locAgg)
+            
+        i.location_latest_data = json.dumps(returnData.get('current'))
         i.save()
 
 #get location by name

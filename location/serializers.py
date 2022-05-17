@@ -12,6 +12,7 @@ class LocationViewSerializer(serializers.ModelSerializer):
             'created_at',
             'lastupdate_at',
             'location_avail_params',
+            'location_latest_data',
         ]
 
 class LocationAddSerializer(serializers.ModelSerializer):
@@ -26,7 +27,7 @@ class DetailLocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
         fields = '__all__'
-        read_only_fields = ['id', 'location_name', 'location_lat', 'location_lon', 'user', 'location_avail_params']
+        read_only_fields = ['id', 'location_name', 'location_lat', 'location_lon', 'user', 'location_avail_params', 'location_latest_data']
 
     def get_username(self, location):
         user = location.user.username

@@ -29,10 +29,14 @@ class Location(models.Model):
     location_country = models.CharField(max_length=120, null=False, default='0')
     location_timezone = models.CharField(max_length=120, null=False, default='0')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default='1')
+    location_latest_data = models.TextField(blank=True, null=True)
 
 
     def __str__(self):
-        return self.location_name 
+        return self.location_name
+
+    class Meta:
+         unique_together = ('location_name', 'user')
 
     #def save(self, *args, **kwargs ):
     #    self.parameters_link = settings.SITE_URL + 'locations/' + str(self.id) + '/parameters/'
@@ -64,7 +68,10 @@ class Parameter(models.Model):
     parameter_key_name=models.CharField(max_length=120, blank=False, null=False)
 
     def __str__(self):
-        return self.name 
+        return self.name
+    
+    class Meta:
+         unique_together = ('location', 'parameter_key_name')
 
     #def save(self, *args, **kwargs ):
     #    self.location_link = settings.SITE_URL + 'locations/' + self.location
@@ -74,6 +81,8 @@ class Parameter(models.Model):
 def para_loc(sender, instance, created, **kwargs):
     if created:
         instance.location_link = settings.SITE_URL + 'locations/' + str(instance.location_id)
+        if not instance.name :
+            instance.name = instance.location.location_name + '-' + instance.parameter_key_name
         instance.save()
     else:
         link = settings.SITE_URL + 'locations/' + str(instance.location_id)
