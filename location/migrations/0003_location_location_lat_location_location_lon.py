@@ -1,1 +1,0 @@
-d:\programming\weatherapi\backend\location\migrations\0003_location_location_lat_location_location_lon.py

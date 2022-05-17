@@ -1,1 +1,0 @@
-d:\programming\weatherapi\backend\location\migrations\0007_weatherapi.py

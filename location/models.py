@@ -26,6 +26,7 @@ class Location(models.Model):
     location_avail_params = models.TextField(blank=True, null=True)
     location_lat = models.CharField(max_length=120, null=False, default='0')
     location_lon = models.CharField(max_length=120, null=False, default='0')
+    location_country = models.CharField(max_length=120, null=False, default='0')
     location_timezone = models.CharField(max_length=120, null=False, default='0')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default='1')
 
@@ -59,7 +60,7 @@ class Parameter(models.Model):
     latest_value = models.TextField(blank=True, null=True)
     values = models.TextField(blank=True, null=True)
     aggregation = models.TextField(blank=True, null=True)
-    unitsofmeasurment = models.CharField(max_length=120, blank=False, null=True)
+    unitsofmeasurment = models.CharField(max_length=120, blank=False, null=False, default="metric")
     parameter_key_name=models.CharField(max_length=120, blank=False, null=False)
 
     def __str__(self):

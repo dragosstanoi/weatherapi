@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import Location,Parameter
 
 
-class LocationSerializer(serializers.ModelSerializer):
+class LocationViewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
         fields = [
@@ -10,8 +10,14 @@ class LocationSerializer(serializers.ModelSerializer):
             'location_name',
             'description',
             'created_at',
-            'lastupdate_at'
+            'lastupdate_at',
+            'location_avail_params',
         ]
+
+class LocationAddSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Location
+        fields = '__all__'
 
 class DetailLocationSerializer(serializers.ModelSerializer):
     
@@ -20,7 +26,7 @@ class DetailLocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
         fields = '__all__'
-        read_only_fields = ['id', 'location_name', 'location_lat', 'location_lat', 'user']
+        read_only_fields = ['id', 'location_name', 'location_lat', 'location_lon', 'user', 'location_avail_params']
 
     def get_username(self, location):
         user = location.user.username
@@ -38,6 +44,11 @@ class LocationParameterSerializer(serializers.ModelSerializer):
             'unitsofmeasurment',
             'parameter_key_name'
         ]
+
+class LocationAddParameterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Parameter
+        fields = '__all__'
 
 class LocationParameterDetailSerializer(serializers.ModelSerializer):
     class Meta:

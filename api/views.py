@@ -12,9 +12,11 @@ from rest_framework.permissions import IsAuthenticated
 
 from rest_framework.response import Response
 from rest_framework import status
-from location.serializers import LocationSerializer, DetailLocationSerializer, LocationParameterSerializer, LocationParameterDetailSerializer
+from location.serializers import *
 import logging
 from pprint import pformat, pprint
+
+from jobs.getData import apiCallSingle, apiCallHistory
 
 #from account.models import Account
 #from rest_framework.authtoken.models import Token
@@ -67,18 +69,50 @@ def api_locations(request, *args, **kwargs):
         return Response(status = status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
-        data=LocationSerializer(locations, many=True).data
+        data=LocationViewSerializer(locations, many=True).data
         return Response(data)
 
     elif request.method == 'POST':
-        location = Location(user=request.user)
+        
+        response = apiCallSingle(request.data['location_name'])
+        
+        #logger=logging.getLogger('django')
+        #logger.info('Args :' +pformat(response))
+        #logger.info('Object :' +pformat(type(response)))
+        
         status_data={}
-        serializer = LocationSerializer(location, data = request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            status_data['status'] = 'Location added !'
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        if (response['cod'] == 200):
+            hyst_data = apiCallHistory(response['coord']['lat'], response['coord']['lon'])
+            #logger.info('Hyst Data :' + pformat(hyst_data))
+            
+            
+            # delete parametres thar are constant or not/aggregation
+            hyst_data['params'].remove('dt')
+            hyst_data['params'].remove('weather')
+
+            build_data = {
+                'description' : request.data['location_name'],
+                'location_name' : request.data['location_name'],
+                'location_lat' : response['coord']['lat'],
+                'location_lon' : response['coord']['lon'],
+                'location_country' : response['sys']['country'],
+                'location_timezone' : response['timezone'],
+                'location_id' : response['id'],
+                'location_avail_params' : str(hyst_data['params'])        
+            }
+            location = Location(user=request.user)
+            serializer = LocationAddSerializer(location, data = build_data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                status_data['status'] = 'Location added !'
+                status_data['response'] = response
+                return Response(status_data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            status_data['status'] = 'We have an errror !'
+            status_data['data'] = response
+            return Response(status_data, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(["GET", "PATCH", "DELETE"])
@@ -153,16 +187,31 @@ def api_location_parameters(request, *args, **kwargs):
         return Response(data)
 
     elif request.method == 'POST':
+
+        location_id = Parameter(location_id = kwargs['lk'])
+        
         status_data={}
-        serializer = LocationParameterSerializer(data = request.data, partial=True)
+
+        #logger=logging.getLogger('django')
+        #logger.info('Args :' +pformat(location.location_avail_params))
+        #logger.info('Args :' +pformat(type(list(location.location_avail_params))))
+        location_para = list(location.location_avail_params)
+        if request.data['parameter_key_name'] not in location_para:
+            status_data['error'] = 'We have an error : parameter not in list !'
+            status_data['data'] = request.data
+            return Response(status_data, status=status.HTTP_400_BAD_REQUEST)
+
+        
+        serializer = LocationAddParameterSerializer(location_id, data = request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             status_data['status'] = 'Location Parameter added !'
+            status_data['data'] = serializer.data
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(["GET", "POST", "DELETE"])
+@api_view(["GET", "DELETE"])
 @authentication_classes([SessionAuthentication, BasicAuthentication])
 @permission_classes([IsAuthenticated])
 def api_location_parameters_detail(request, *args, **kwargs):
@@ -181,14 +230,14 @@ def api_location_parameters_detail(request, *args, **kwargs):
         data=LocationParameterDetailSerializer(location_para).data
         return Response(data)
 
-    elif request.method == 'POST':
-        status_data={}
-        serializer = LocationParameterDetailSerializer(data = request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            status_data['status'] = 'Location Parameter modified !'
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    #elif request.method == 'POST':
+    #    status_data={}
+    #    serializer = LocationParameterDetailSerializer(data = request.data, partial=True)
+    #    if serializer.is_valid():
+    #        serializer.save()
+    #        status_data['status'] = 'Location Parameter modified !'
+    #        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
         action = location_para.delete()

@@ -113,6 +113,7 @@ def apiCallHistory(lat, lon) :
     returnData = {}
     returnData['current'] = res_apicall_today['current']
     returnData['hist_hourly'] = final_list[-24:]
+    returnData['params'] = params
 
     return returnData
 
